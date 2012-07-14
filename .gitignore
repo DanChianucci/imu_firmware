@@ -5,8 +5,10 @@
 
 # Compiled Dynamic libraries
 *.so
-
 # Compiled Static libraries
 *.lai
 *.la
 *.a
+# Release Files
+/Release/
+/.settings/
