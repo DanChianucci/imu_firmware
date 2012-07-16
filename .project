@@ -3,7 +3,7 @@
 	<name>Copter</name>
 	<comment></comment>
 	<projects>
-		<project>AHRSuIMU</project>
+		<project>Arduino_Uno</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
