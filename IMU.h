@@ -15,13 +15,6 @@
 #include "ITG3200/ITG3200.h"
 
 
-#define sampleFreq	50.0f		/// sample frequency in Hz
-#define betaDef		0.1f		/// 2 * proportional gain
-
-#define Kp 2.0f   				/// proportional gain governs rate of convergence to accelerometer/magnetometer
-#define Ki 0.005f   			/// integral gain governs rate of convergence of gyroscope biases
-#define halfT 0.01f   			/// half the sample period
-
 
 /**
  * The Following defines are used to map Sensor axis' to a common board axis
@@ -138,19 +131,43 @@ public:
 	 */
 	void getData(float *q, float *a, float *g, float *m );
 
+	/**
+	 * Resets the IMU Quaternion and error Integral
+	 */
+	void reset();
+
+	//://////////////////////////////////////////////////////////////////////////////////////
+	//:                                Default Gains
+	//://////////////////////////////////////////////////////////////////////////////////////
+	float sampleFreq;	/// sample frequency in Hz
+	float halfT;   		/// half the sample period
+
+	float beta;  		/// 2 * proportional gain
+	float Kp; 			/// proportional gain governs rate of convergence to accelerometer/magnetometer
+	float Ki;  		    /// integral gain governs rate of convergence of gyroscope biases
+
 private:
+	//://////////////////////////////////////////////////////////////////////////////////////
+	//:                       Sensors and Calibration Data
+	//://////////////////////////////////////////////////////////////////////////////////////
 	ADXL345  acc; 			/// The Accelerometer
 	HMC5883L mag; 			/// The Magnetometer
 	ITG3200  gyr; 			/// The Gyroscope
-
-	float exInt, eyInt, ezInt;
 
 	float gyrOffsets[3];	///Raw Offsets of gyroscope
 	int16_t magMaxs[3];		///Raw Maxes of Magnetometer
 	float magScales[3];		///Raw Scale Factors of Magnetometer
 	float accOffsets[3];	///Raw Acc Ofsets
 
-	float beta;				/// algorithm gain
+	float exInt, eyInt, ezInt;
+
+
+
+
+
+	//://////////////////////////////////////////////////////////////////////////////////////
+	//:                                 Sensor Values
+	//://////////////////////////////////////////////////////////////////////////////////////
 	float q0,q1,q2,q3;		/// quaternion of sensor frame relative to auxiliary frame
 
 	int16_t accRaw[3];		///Raw Accelerometer Values

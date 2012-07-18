@@ -38,7 +38,8 @@ void setup();
 	} // extern "C"
 #endif
 
-
+void printData();
+void getCommands();
 
 
 #endif /* Copter_H_ */

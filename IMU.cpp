@@ -9,7 +9,19 @@
 #include <math.h>
 
 IMU::IMU() {
-	beta=betaDef; // 2 * proportional gain
+
+	sampleFreq=25.0;
+	halfT=0.02;
+
+	beta=0.1;
+	Kp=2.0;
+	Ki=0.005;
+
+	exInt=0;
+	eyInt=0;
+	ezInt=0;
+
+
 	//quaternion of sensor frame relative to auxiliary frame
 	q0=1.0f;
 	q1=0.0f;
@@ -45,6 +57,18 @@ void IMU::init(uint8_t accAddr, uint8_t gyrAddr, uint8_t magAddr)
 	delay(100);
 	mag.setMode(HMC5883L_MODE_SINGLE);
 	mag.setDataRate(HMC5883L_RATE_75); //75Hz data rate
+}
+
+void IMU::reset()
+{
+	exInt=0;
+	eyInt=0;
+	ezInt=0;
+	//quaternion of sensor frame relative to auxiliary frame
+	q0=1.0f;
+	q1=0.0f;
+	q2=0.0f;
+	q3=0.0f;
 }
 
 void IMU::calibrateGyr()
@@ -116,7 +140,6 @@ void IMU::calibrateAcc()
 	accOffsets[2] = 1;//0.00376265;
 }
 
-//Does not account for axis mis match or scaling or sign
 void IMU::getValuesRaw(int16_t *accV, int16_t *gyrV, int16_t *magV)
 {
 	acc.getAcceleration(&accV[0],&accV[1],&accV[2]);
@@ -125,7 +148,7 @@ void IMU::getValuesRaw(int16_t *accV, int16_t *gyrV, int16_t *magV)
 
 	mag.getHeading(&magV[0],&magV[1],&magV[2]);
 }
-//Accounts for Axis Mismatch, Sign, and Scaling
+
 void IMU::getValuesScaled(float *accV, float *gyrV, float *magV)
 {
 	//TODO scale everything correctly
@@ -144,9 +167,6 @@ void IMU::getValuesScaled(float *accV, float *gyrV, float *magV)
 	magV[1]=magRaw[MY]*magScales[MY]*MYS;
 	magV[2]=magRaw[MZ]*magScales[MZ]*MZS;
 }
-
-
-
 
 void IMU::MadgwickAHRSupdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz) {
 //	float recipNorm;
