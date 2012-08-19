@@ -39,6 +39,7 @@ void setup();
 #endif
 
 void printData();
+void printQuat();
 void getCommands();
 
 

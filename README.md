@@ -1,6 +1,6 @@
 Copter
 ======
-S/W which controls a quadcopter using the Hardware from the MARGS Project
+Software to compute quaternion using the Hardware documented in the MARGS project
 
 *Features:*
 	Computes Quaternion Using Seb Madgwicks Algorithms

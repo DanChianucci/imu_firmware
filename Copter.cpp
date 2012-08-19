@@ -1,30 +1,42 @@
 #include "Copter.h"
-
-#include <avr/interrupt.h>
-
 #include "wire.h"
 
 //The setup function is called once at startup of the sketch
 void setup()
 {
 	Serial.begin(19200);
+	Serial.flush();
+
+	while(Serial.available()<=0 || Serial.peek()!='?')
+	{
+		Serial.read();
+	}
+
+	Serial.println("I am an AHRSuIMU");
+	Serial.flush();
+
 	Wire.begin();
 	imu.init();
+
 }
 
-int PERIOD=40;
-
+int PERIOD=20;
 
 void loop() {
 	long startloop = millis();
 
 	imu.Update();
 	imu.getData(qV,aV,gV,mV);
-	printData();
-	getCommands();
+
+	if(Serial.available() && Serial.read()=='g')
+		printQuat();
+
+	if(Serial.available())
+		while(Serial.available())
+			Serial.read(); //empty the buffer
+
 
 	long wait = PERIOD-(millis()-startloop);
-
 	if(wait>0)
 	{
 		delay(wait);
@@ -88,6 +100,15 @@ void getCommands()
 	imu.reset();
 }
 
+void printQuat()
+{
+	for(int i=0; i < 4; i++)
+		{
+			Serial.print(qV[i]);
+			Serial.print(",");
+		}
+	Serial.println(".");
+}
 
 void printData()
 {
