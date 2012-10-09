@@ -65,12 +65,15 @@ void IMU::reset()
 	exInt=0;
 	eyInt=0;
 	ezInt=0;
+
 	//quaternion of sensor frame relative to auxiliary frame
 	q0=1.0f;
 	q1=0.0f;
 	q2=0.0f;
 	q3=0.0f;
 }
+
+
 
 void IMU::calibrateGyr()
 {
@@ -141,33 +144,34 @@ void IMU::calibrateAcc()
 	accOffsets[2] = 1;//0.00376265;
 }
 
-void IMU::getValuesRaw(int16_t *accV, int16_t *gyrV, int16_t *magV)
+
+
+void IMU::getValuesRaw(int16_t accV[], int16_t gyrV[], int16_t magV[])
 {
-	acc.getAcceleration(&accV[0],&accV[1],&accV[2]);
-
-	gyr.getRotation(&gyrV[0],&gyrV[1],&gyrV[2]);
-
-	mag.getHeading(&magV[0],&magV[1],&magV[2]);
+	acc.getAcceleration(&accV[X],&accV[Y],&accV[Z]);
+	gyr.getRotation(&gyrV[X],&gyrV[Y],&gyrV[Z]);
+	mag.getHeading(&magV[X],&magV[Y],&magV[Z]);
 }
 
-void IMU::getValuesScaled(float *accV, float *gyrV, float *magV)
+void IMU::getValuesScaled(float accV[], float gyrV[], float magV[])
 {
 	//TODO scale everything correctly
 	getValuesRaw(accRaw,gyrRaw,magRaw);
 
-	accV[0]=accRaw[AX]*accOffsets[AX]*AXS;
-	accV[1]=accRaw[AY]*accOffsets[AY]*AYS;
-	accV[2]=accRaw[AZ]*accOffsets[AZ]
-	                              *AZS;
+	accV[X]=accRaw[AXA]*accOffsets[AXA]*AXS;
+	accV[Y]=accRaw[AYA]*accOffsets[AYA]*AYS;
+	accV[Z]=accRaw[AZA]*accOffsets[AZA]*AZS;
 
-	gyrV[0]=(gyrRaw[GX]-gyrOffsets[GX])/14.375*PI/180*GXS;//* gains[0]
-	gyrV[1]=(gyrRaw[GY]-gyrOffsets[GY])/14.375*PI/180*GXS;
-	gyrV[2]=(gyrRaw[GZ]-gyrOffsets[GZ])/14.375*PI/180*GZS;
+	gyrV[X]=(gyrRaw[GXA]-gyrOffsets[GXA])/14.375*PI/180*GXS;//* gains[0]
+	gyrV[Y]=(gyrRaw[GYA]-gyrOffsets[GYA])/14.375*PI/180*GXS;
+	gyrV[Z]=(gyrRaw[GZA]-gyrOffsets[GZA])/14.375*PI/180*GZS;
 
-	magV[0]=magRaw[MX]*magScales[MX]*MXS;
-	magV[1]=magRaw[MY]*magScales[MY]*MYS;
-	magV[2]=magRaw[MZ]*magScales[MZ]*MZS;
+	magV[X]=magRaw[MXA]*magScales[MXA]*MXS;
+	magV[Y]=magRaw[MYA]*magScales[MYA]*MYS;
+	magV[Z]=magRaw[MZA]*magScales[MZA]*MZS;
 }
+
+
 
 void IMU::MadgwickAHRSupdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz) {
 	float recipNorm;
@@ -264,76 +268,6 @@ void IMU::MadgwickAHRSupdate(float gx, float gy, float gz, float ax, float ay, f
 	q1 *= recipNorm;
 	q2 *= recipNorm;
 	q3 *= recipNorm;
-
-//	  float norm;
-//	  float hx, hy, hz, bx, bz;
-//	  float vx, vy, vz, wx, wy, wz;
-//	  float ex, ey, ez;
-//
-//	  // auxiliary variables to reduce number of repeated operations
-//	  float q0q0 = q0*q0;
-//	  float q0q1 = q0*q1;
-//	  float q0q2 = q0*q2;
-//	  float q0q3 = q0*q3;
-//	  float q1q1 = q1*q1;
-//	  float q1q2 = q1*q2;
-//	  float q1q3 = q1*q3;
-//	  float q2q2 = q2*q2;
-//	  float q2q3 = q2*q3;
-//	  float q3q3 = q3*q3;
-//
-//	  // normalise the measurements
-//	  norm = sqrt(ax*ax + ay*ay + az*az);
-//	  ax = ax / norm;
-//	  ay = ay / norm;
-//	  az = az / norm;
-//	  norm = sqrt(mx*mx + my*my + mz*mz);
-//	  mx = mx / norm;
-//	  my = my / norm;
-//	  mz = mz / norm;
-//
-//	  // compute reference direction of flux
-//	  hx = 2*mx*(0.5 - q2q2 - q3q3) + 2*my*(q1q2 - q0q3) + 2*mz*(q1q3 + q0q2);
-//	  hy = 2*mx*(q1q2 + q0q3) + 2*my*(0.5 - q1q1 - q3q3) + 2*mz*(q2q3 - q0q1);
-//	  hz = 2*mx*(q1q3 - q0q2) + 2*my*(q2q3 + q0q1) + 2*mz*(0.5 - q1q1 - q2q2);
-//	  bx = sqrt((hx*hx) + (hy*hy));
-//	  bz = hz;
-//
-//	  // estimated direction of gravity and flux (v and w)
-//	  vx = 2*(q1q3 - q0q2);
-//	  vy = 2*(q0q1 + q2q3);
-//	  vz = q0q0 - q1q1 - q2q2 + q3q3;
-//	  wx = 2*bx*(0.5 - q2q2 - q3q3) + 2*bz*(q1q3 - q0q2);
-//	  wy = 2*bx*(q1q2 - q0q3) + 2*bz*(q0q1 + q2q3);
-//	  wz = 2*bx*(q0q2 + q1q3) + 2*bz*(0.5 - q1q1 - q2q2);
-//
-//	  // error is sum of cross product between reference direction of fields and direction measured by sensors
-//	  ex = (ay*vz - az*vy) + (my*wz - mz*wy);
-//	  ey = (az*vx - ax*vz) + (mz*wx - mx*wz);
-//	  ez = (ax*vy - ay*vx) + (mx*wy - my*wx);
-//
-//	  // integral error scaled integral gain
-//	  exInt = exInt + ex*Ki;
-//	  eyInt = eyInt + ey*Ki;
-//	  ezInt = ezInt + ez*Ki;
-//
-//	  // adjusted gyroscope measurements
-//	  gx = gx + Kp*ex + exInt;
-//	  gy = gy + Kp*ey + eyInt;
-//	  gz = gz + Kp*ez + ezInt;
-//
-//	  // integrate quaternion rate and normalise
-//	  q0 = q0 + (-q1*gx - q2*gy - q3*gz)*halfT;
-//	  q1 = q1 + (q0*gx + q2*gz - q3*gy)*halfT;
-//	  q2 = q2 + (q0*gy - q1*gz + q3*gx)*halfT;
-//	  q3 = q3 + (q0*gz + q1*gy - q2*gx)*halfT;
-//
-//	  // normalise quaternion
-//	  norm = sqrt(q0*q0 + q1*q1 + q2*q2 + q3*q3);
-//	  q0 = q0 / norm;
-//	  q1 = q1 / norm;
-//	  q2 = q2 / norm;
-//	  q3 = q3 / norm;
 }
 
 void IMU::MadgwickAHRSupdateIMU(float gx, float gy, float gz, float ax, float ay, float az) {
@@ -413,7 +347,7 @@ void IMU::Update()
 						magScaled[0],magScaled[1],magScaled[2]);
 }
 
-void IMU::getQuaternion(float *quatArr)
+void IMU::getQuaternion(float quatArr[])
 {
 	quatArr[0]=q0;
 	quatArr[1]=q1;
@@ -421,7 +355,7 @@ void IMU::getQuaternion(float *quatArr)
 	quatArr[3]=q3;
 }
 
-void IMU::getData(float *q, float *a, float *g, float *m )
+void IMU::getData(float q[], float a[], float g[], float m[] )
 {
 	q[0]=q0;
 	q[1]=q1;
@@ -442,12 +376,14 @@ void IMU::getData(float *q, float *a, float *g, float *m )
 
 }
 
-float IMU::invSqrt(float x) {
+float IMU::invSqrt(float x)
+{
 	float halfx = 0.5f * x;
 	float y = x;
-	long i = *(long*)&y;
-	i = 0x5f3759df - (i>>1);
-	y = *(float*)&i;
-	y = y * (1.5f - (halfx * y * y));
+	long i = *(long*)&y;					//y to long
+	i = 0x5f3759df - (i>>1);				//first approximation
+	y = *(float*)&i;						//y back to float
+	y = y * (1.5f - (halfx * y * y));		//newtons method
+	//y = y * (1.5f - (halfx * y * y));
 	return y;
 }

@@ -8,64 +8,14 @@
 #ifndef IMU_H_
 #define IMU_H_
 
-
-
 #include "ADXL345/ADXL345.h"
 #include "HMC5883L/HMC5883L.h"
 #include "ITG3200/ITG3200.h"
 
-
-
 /**
- * The Following defines are used to map Sensor axis' to a common board axis
- * For Example:
- * 		GX means the X-Axis of the Gyroscope
- * 		GY means the Y-Axis of the Gyroscope
- * 		GZ means the Z-Axis of the Gyroscope
- *
- * 		0 means the X-axis of the Board
- * 		1 means the Y-axis of the Board
- * 		2 means the Z-axis of the Board
- *
- * 		Therefore
- * 		GX 0 would mean that the gyroscope's X-axis is the same as the boards X Axis.
- * 		GX 1 would mean that the gyroscope's X-axis corresponds to the boards Y Axis.
- *
- *
- *  The Defines with S at the end stand for the sign of the axis after the alignment to the board axis.
- *  For Example:
- *  	GXS 1 means the the board X-axis needs to be negated for the gyro.
- */
-
-#define GX 0
-#define GY 1
-#define GZ 2
-
-#define GXS 1
-#define GYS 1
-#define GZS 1
-
-#define MX 1
-#define MY 0
-#define MZ 2
-
-#define MXS 1
-#define MYS -1
-#define MZS 1
-
-#define AX 1
-#define AY 0
-#define AZ 2
-
-#define AXS -1
-#define AYS 1
-#define AZS 1
-
-
-/**
- * IMU class takes care of updating the orientation of the board, it also handles
- * Sensor Calibration / initialization, and aligning all sensor axis to a common
- * orthagonal coorinate system.
+ * IMU class takes care of updating the orientation of the board, it also
+ * handles Sensor Calibration / initialization, and aligning all sensor axis to
+ * a common orthagonal coorinate system.
  */
 class IMU {
 public:
@@ -75,7 +25,8 @@ public:
 	IMU();
 
 	/**
-	 * Updates the IMU orientation. Must be called regularly in order to work properly
+	 * Updates the IMU orientation. Must be called regularly in order to work
+	 * properly
 	 */
 	void Update();
 
@@ -136,20 +87,20 @@ public:
 	 */
 	void reset();
 
-	//://////////////////////////////////////////////////////////////////////////////////////
+	//://///////////////////////////////////////////////////////////////////////
 	//:                                Default Gains
-	//://////////////////////////////////////////////////////////////////////////////////////
+	//://///////////////////////////////////////////////////////////////////////
 	float sampleFreq;	/// sample frequency in Hz
 	float halfT;   		/// half the sample period
 
-	float beta;  		/// 2 * proportional gain
-	float Kp; 			/// proportional gain governs rate of convergence to accelerometer/magnetometer
-	float Ki;  		    /// integral gain governs rate of convergence of gyroscope biases
+	float beta;     /// 2 * proportional gain
+	float Kp; 		/// proportional gain governs rate of convergence to acc/mag
+	float Ki;  		/// integral gain governs rate of convergence of gyro biases
 
 private:
-	//://////////////////////////////////////////////////////////////////////////////////////
+	//://///////////////////////////////////////////////////////////////////////
 	//:                       Sensors and Calibration Data
-	//://////////////////////////////////////////////////////////////////////////////////////
+	//://///////////////////////////////////////////////////////////////////////
 	ADXL345  acc; 			/// The Accelerometer
 	HMC5883L mag; 			/// The Magnetometer
 	ITG3200  gyr; 			/// The Gyroscope
@@ -165,10 +116,10 @@ private:
 
 
 
-	//://////////////////////////////////////////////////////////////////////////////////////
+	//://///////////////////////////////////////////////////////////////////////
 	//:                                 Sensor Values
-	//://////////////////////////////////////////////////////////////////////////////////////
-	float q0,q1,q2,q3;		/// quaternion of sensor frame relative to auxiliary frame
+	//://///////////////////////////////////////////////////////////////////////
+	float q0,q1,q2,q3;		/// quaternion of sensor frame relative to init
 
 	int16_t accRaw[3];		///Raw Accelerometer Values
 	int16_t gyrRaw[3];		///Raw Gyroscope Values
@@ -178,32 +129,102 @@ private:
 	float gyrScaled[3];		///Sclaed Gyroscope Values
 	float magScaled[3];		///Scaled Magnetometer Values
 
+	//://///////////////////////////////////////////////////////////////////////
+	//:                                Calibration Methods
+	//://///////////////////////////////////////////////////////////////////////
+	void calibrateAcc();
+	void calibrateMag(unsigned char gain);
+	void calibrateGyr();
+
+
+
+	//://///////////////////////////////////////////////////////////////////////
+	//:                                AHRS Methods
+	//://///////////////////////////////////////////////////////////////////////
+
 	/**
 	 * Updates the MARG
 	 * @param  gx , gy , gz   Gyroscope Axis in radians per second
 	 * @param  ax , ay , az   Accelerometer Axis, units are irrelevant
 	 * @param  mx , my , mz   Magnetometer Axis , units are irrelevant
 	 */
-	void MadgwickAHRSupdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz);
+	void MadgwickAHRSupdate(float gx, float gy, float gz, float ax, float ay,
+			float az, float mx, float my, float mz);
 
 	/**
 	 * Updates the IMU, Used by MadgwickAHRSUpdate()
 	 * @param  gx , gy , gz   Gyroscope Axis in radians per second
 	 * @param  ax , ay , az   Accelerometer Axis, units are irrelevant
 	 */
-	void MadgwickAHRSupdateIMU(float gx, float gy, float gz, float ax, float ay, float az);
+	void MadgwickAHRSupdateIMU(float gx, float gy, float gz, float ax, float ay,
+			float az);
 
-	void calibrateAcc();
-	void calibrateMag(unsigned char gain);
-	void calibrateGyr();
-
+	/**
+	 * Calulates an approximation of the inverse squar root of x
+	 * @param x the number to calulate the inverse squar root of
+	 * @return the inverse squar root of x
+	 */
 	float invSqrt(float x);
 
 
+	/**
+	 * The Following defines are used to map Sensor axis' to a common board axis
+	 * For Example:
+	 * 		GX means the X-Axis of the Gyroscope
+	 * 		GY means the Y-Axis of the Gyroscope
+	 * 		GZ means the Z-Axis of the Gyroscope
+	 *
+	 * 		0 means the X-axis of the Board
+	 * 		1 means the Y-axis of the Board
+	 * 		2 means the Z-axis of the Board
+	 *
+	 * 		Therefore
+	 * 		GX 0 would mean that the gyroscope's X-axis is the same as the boards X Axis.
+	 * 		GX 1 would mean that the gyroscope's X-axis corresponds to the boards Y Axis.
+	 *
+	 *
+	 *  The Defines with S at the end stand for the sign of the axis after the alignment to the board axis.
+	 *  For Example:
+	 *  	GXS 1 means the the board X-axis needs to be negated for the gyro.
+	 */
+
+	enum AXIS_VALUE
+	{
+		X=0,
+		Y=1,
+		Z=2
+	};
 
 
+	/**
+	 * Maps the Sensor Axis to the Board Axis
+	 */
+	static const int GXA = X;	  //Gyr
+	static const int GYA = Y;
+	static const int GZA = Z;
 
+	static const int MXA = Y;     //Mag
+	static const int MYA = X;
+	static const int MZA = Z;
 
+	static const int AXA = Y;     //Acc
+	static const int AYA = X;
+	static const int AZA = Z;
+
+	/**
+	 * Determines whether a Board Axis needs to be negated
+	 */
+	static const int GXS =  1;
+	static const int GYS =  1;
+	static const int GZS =  1;
+
+	static const int MXS =  1;
+	static const int MYS = -1;
+	static const int MZS =  1;
+
+	static const int AXS = -1;
+	static const int AYS =  1;
+	static const int AZS =  1;
 };
 
 #endif /* IMU_H_ */
