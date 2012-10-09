@@ -24,7 +24,7 @@ IMU   imu;				/// The IMU calculator
 float gV[3];			/// Gyroscope Measurments in rad/sec
 float aV[3];			/// Accelerometer Measurments in milli g
 float mV[3];			/// Mag Measurments in ???
-float qV[3];			/// The Quaternion Vector
+float qV[4];			/// The Quaternion Vector
 
 
 #ifdef __cplusplus
