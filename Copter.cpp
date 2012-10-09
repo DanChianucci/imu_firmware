@@ -4,42 +4,46 @@
 //The setup function is called once at startup of the sketch
 void setup()
 {
+
 	Serial.begin(19200);
-	Serial.flush();
 
-	while(Serial.available()<=0 || Serial.peek()!='?')
-	{
-		Serial.read();
-	}
-
-	Serial.println("I am an AHRSuIMU");
-	Serial.flush();
-
+//	Serial.flush();
+//
+//	while(Serial.available()>0 || Serial.peek()!='?')
+//	{
+//		Serial.read();
+//	}
+//	Serial.println("I am an AHRSuIMU");
+//	Serial.flush();
 	Wire.begin();
 	imu.init();
 
 }
 
 int PERIOD=20;
+long waitTime=0;
 
-void loop() {
+void loop()
+{
 	long startloop = millis();
 
 	imu.Update();
 	imu.getData(qV,aV,gV,mV);
 
-	if(Serial.available() && Serial.read()=='g')
+	if(Serial.available() && Serial.peek()=='g')
 		printQuat();
 
-	if(Serial.available())
-		while(Serial.available())
-			Serial.read(); //empty the buffer
+	else if(Serial.available() && Serial.peek()=='a')
+		printData();
+
+	while(Serial.available())
+		Serial.read(); //empty the buffer
 
 
-	long wait = PERIOD-(millis()-startloop);
-	if(wait>0)
+	waitTime = PERIOD-(millis()-startloop);
+	if(waitTime>0)
 	{
-		delay(wait);
+		delay(waitTime);
 	}
 }
 
@@ -55,6 +59,7 @@ void getCommands()
 	}
 	else
 		return;
+
 	String cmd = String(buffer);
 	cmd=cmd.substring(0,cmd.indexOf(':'));
 
@@ -87,6 +92,7 @@ void getCommands()
 		Serial.print("Changing Ki: "); Serial.println(amount);
 		imu.Ki=amount;
 	}
+
 	else
 	{
 		Serial.println(cmd +" Not Recognized");
@@ -123,16 +129,19 @@ void printData()
 		Serial.print(aV[i]);
 		Serial.print(",");
 	}
+
 	for(int i=0; i < 3; i++)
 	{
 		Serial.print(mV[i]);
 		Serial.print(",");
 	}
+
 	for(int i=0; i < 3; i++)
 	{
 		Serial.print(gV[i]);
 		Serial.print(",");
 	}
-	Serial.println("");
+
+	Serial.println(waitTime);
 }
 

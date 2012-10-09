@@ -48,7 +48,6 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Users\Dan\Workspaces\Arduino\Libraries\I2CDevLib\I2Cdev&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Users\Dan\Applications\arduino-1.0.1\libraries\Wire\utility&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Users\Dan\Applications\arduino-1.0.1\libraries\Wire&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Copter}&quot;"/>
 								</option>
 								<option id="it.baeyens.avreclipse.compiler.option.def.1180835879" name="Define Syms (-D)" superClass="it.baeyens.avreclipse.compiler.option.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="ARDUINO=101"/>
@@ -71,7 +70,6 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Users\Dan\Workspaces\Arduino\Libraries\I2CDevLib\I2Cdev&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Users\Dan\Applications\arduino-1.0.1\libraries\Wire\utility&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Users\Dan\Applications\arduino-1.0.1\libraries\Wire&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Copter}&quot;"/>
 								</option>
 								<option id="it.baeyens.avreclipse.cppcompiler.option.def.1200923855" name="Define Syms (-D)" superClass="it.baeyens.avreclipse.cppcompiler.option.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="ARDUINO=101"/>
@@ -128,8 +126,10 @@
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="it.baeyens.avreclipse.core.AVRGCCManagedMakePerProjectProfileC"/>
 		</scannerConfigBuildInfo>
 	</storageModule>
-	<storageModule moduleId="refreshScope" versionNumber="1">
-		<resource resourceType="PROJECT" workspacePath="/secondEclipseTest"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Release">
+			<resource resourceType="PROJECT" workspacePath="/secondEclipseTest"/>
+		</configuration>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings">
