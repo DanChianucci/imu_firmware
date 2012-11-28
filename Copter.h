@@ -5,21 +5,6 @@
 
 #include "IMU.h"
 
-//#define DEBUG_COPTER = 0
-
-
-#ifdef DEBUG_COPTER
-	#define DEBUG_SERIAL_BEGIN( x ) Serial.begin( x )
-	#define DEBUG_PRINT(x)  Serial.print(x)
-	#define DEBUG_FLUSH() Serial.flush();
-	#define DEBUG_PRINTLN(x) Serial.println(x)
-#else
-  	#define DEBUG_PRINT(x)
-	#define DEBUG_SERIAL_BEGIN(x)
-	#define DEBUG_FLUSH()
-	#define DEBUG_PRINTLN(x)
-#endif
-
 IMU   imu;				/// The IMU calculator
 float gV[3];			/// Gyroscope Measurments in rad/sec
 float aV[3];			/// Accelerometer Measurments in milli g

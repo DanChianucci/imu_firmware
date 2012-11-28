@@ -6,15 +6,6 @@ void setup()
 {
 
 	Serial.begin(19200);
-
-//	Serial.flush();
-//
-//	while(Serial.available()>0 || Serial.peek()!='?')
-//	{
-//		Serial.read();
-//	}
-//	Serial.println("I am an AHRSuIMU");
-//	Serial.flush();
 	Wire.begin();
 	imu.init();
 
@@ -28,13 +19,18 @@ void loop()
 	long startloop = millis();
 
 	imu.Update();
-	imu.getData(qV,aV,gV,mV);
+
 
 	if(Serial.available() && Serial.peek()=='g')
+	{
+		imu.getQuaternion(qV);
 		printQuat();
-
+	}
 	else if(Serial.available() && Serial.peek()=='a')
+	{
+		imu.getData(qV,aV,gV,mV);
 		printData();
+	}
 
 	while(Serial.available())
 		Serial.read(); //empty the buffer
